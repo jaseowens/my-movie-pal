@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var config = require('../config/config')
 const apiRoutes = express.Router();
 const Common = require('../Common');
+const MovieDB = require('moviedb')(config.tmdbKey);
 
 //Import user functions
 //const userRoutes = require('./users')
@@ -16,11 +17,14 @@ const Common = require('../Common');
 //Example 1 of authentication required route,
 //Pass in our defined middleware of verifyToken, which looks for the token in 
 //head, body, or parameters, for validation
-apiRoutes.get('/', Common.verifyToken, function(req,res) {
+apiRoutes.get('/', function(req,res) {
+    var movieToSearch = req.query.movie;
+
     //If verified give message
-    console.log(req.body);
-    console.log(req.query);
-    res.json({message: 'API up and running, and you are authenticated'});
+    MovieDB.searchMovie({ query: movieToSearch }, (err, result) => {
+        console.log(result);
+        res.json(result);
+    });
 });
 
 module.exports = apiRoutes;
